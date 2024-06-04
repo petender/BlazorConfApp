@@ -1,0 +1,29 @@
+﻿@page "/conferencesessions"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorConfApp.Data.BlazorConfAppContext DB
+@using BlazorConfApp.Models
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="conferencesessions/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.ConferenceSession">
+    <PropertyColumn Property="conferencesession => conferencesession.Title" />
+    <PropertyColumn Property="conferencesession => conferencesession.Speaker" />
+    <PropertyColumn Property="conferencesession => conferencesession.Abstract" />
+    <PropertyColumn Property="conferencesession => conferencesession.TechnicalDomain" />
+    <PropertyColumn Property="conferencesession => conferencesession.Duration" />
+    <PropertyColumn Property="conferencesession => conferencesession.IsPublished" />
+
+    <TemplateColumn Context="conferencesession">
+        <a href="@($"conferencesessions/edit?id={conferencesession.Id}")">Edit</a> |
+        <a href="@($"conferencesessions/details?id={conferencesession.Id}")">Details</a> |
+        <a href="@($"conferencesessions/delete?id={conferencesession.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+

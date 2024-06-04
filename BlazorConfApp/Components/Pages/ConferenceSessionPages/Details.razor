@@ -1,0 +1,55 @@
+﻿@page "/conferencesessions/details"
+@inject BlazorConfApp.Data.BlazorConfAppContext DB
+@using BlazorConfApp.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>ConferenceSession</h4>
+    <hr />
+    @if (conferencesession is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@conferencesession.Title</dd>
+            <dt class="col-sm-2">Speaker</dt>
+            <dd class="col-sm-10">@conferencesession.Speaker</dd>
+            <dt class="col-sm-2">Abstract</dt>
+            <dd class="col-sm-10">@conferencesession.Abstract</dd>
+            <dt class="col-sm-2">TechnicalDomain</dt>
+            <dd class="col-sm-10">@conferencesession.TechnicalDomain</dd>
+            <dt class="col-sm-2">Duration</dt>
+            <dd class="col-sm-10">@conferencesession.Duration</dd>
+            <dt class="col-sm-2">IsPublished</dt>
+            <dd class="col-sm-10">@conferencesession.IsPublished</dd>
+        </dl>
+        <div>
+            <a href="@($"/conferencesessions/edit?id={conferencesession.Id}")">Edit</a> |
+            <a href="@($"/conferencesessions")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    ConferenceSession? conferencesession;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        conferencesession = await DB.ConferenceSession.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (conferencesession is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,111 @@
+﻿@page "/ConferenceSessions/edit"
+@inject BlazorConfApp.Data.BlazorConfAppContext DB
+@using BlazorConfApp.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>ConferenceSession</h4>
+<hr />
+@if (ConferenceSession is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="ConferenceSession" OnValidSubmit="UpdateConferenceSession" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="ConferenceSession.Id" value="@ConferenceSession.Id" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value="ConferenceSession.Title" class="form-control" />
+                    <ValidationMessage For="() => ConferenceSession.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="speaker" class="form-label">Speaker:</label>
+                    <InputText id="speaker" @bind-Value="ConferenceSession.Speaker" class="form-control" />
+                    <ValidationMessage For="() => ConferenceSession.Speaker" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="abstract" class="form-label">Abstract:</label>
+                    <InputText id="abstract" @bind-Value="ConferenceSession.Abstract" class="form-control" />
+                    <ValidationMessage For="() => ConferenceSession.Abstract" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="technicaldomain" class="form-label">TechnicalDomain:</label>
+                    <InputText id="technicaldomain" @bind-Value="ConferenceSession.TechnicalDomain" class="form-control" />
+                    <ValidationMessage For="() => ConferenceSession.TechnicalDomain" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Duration:</label>
+                    <InputNumber id="duration" @bind-Value="ConferenceSession.Duration" class="form-control" />
+                    <ValidationMessage For="() => ConferenceSession.Duration" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="ispublished" class="form-label">IsPublished:</label>
+                    <InputCheckbox id="ispublished" @bind-Value="ConferenceSession.IsPublished" class="form-check-input" />
+                    <ValidationMessage For="() => ConferenceSession.IsPublished" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/conferencesessions">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public ConferenceSession? ConferenceSession { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ConferenceSession ??= await DB.ConferenceSession.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ConferenceSession is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateConferenceSession()
+    {
+        DB.Attach(ConferenceSession!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ConferenceSessionExists(ConferenceSession!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/conferencesessions");
+    }
+
+    bool ConferenceSessionExists(int id)
+    {
+        return DB.ConferenceSession.Any(e => e.Id == id);
+    }
+}
